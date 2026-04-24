@@ -1,7 +1,26 @@
 import os
 import logging
+import certifi
+import urllib3
+import requests
 from typing import TypedDict, List, Optional
 from datetime import datetime
+
+# Force disable SSL warnings and verification for restricted environments
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+old_merge_environment_settings = requests.Session.merge_environment_settings
+
+def merge_environment_settings(self, url, proxies, stream, verify, cert):
+    settings = old_merge_environment_settings(self, url, proxies, stream, verify, cert)
+    settings['verify'] = False
+    return settings
+
+requests.Session.merge_environment_settings = merge_environment_settings
+
+# Configure SSL for Windows
+os.environ['SSL_CERT_FILE'] = certifi.where()
+os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+os.environ['CURL_CA_BUNDLE'] = "" # Disable for curl-based tools if any
 
 from dotenv import load_dotenv
 from tavily import TavilyClient
@@ -25,7 +44,7 @@ class AgentState(TypedDict):
 
 # Initialize Clients
 tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Nodes
 def research_node(state: AgentState):
@@ -49,7 +68,7 @@ def research_node(state: AgentState):
     return {"raw_news": all_results}
 
 def analyst_node(state: AgentState):
-    """Analyze news using Gemini-1.5-pro."""
+    """Analyze news using Gemini-2.5-flash."""
     logger.info("Starting Analyst Node...")
     news_context = "\n".join([f"- {r['title']}: {r['content']}" for r in state['raw_news']])
     
