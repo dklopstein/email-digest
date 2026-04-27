@@ -47,8 +47,8 @@ class AgentState(TypedDict):
     email_status: bool
 
 # Initialize Clients
-tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
+tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.environ["GOOGLE_API_KEY"])
 
 # Nodes
 def research_node(state: AgentState):
