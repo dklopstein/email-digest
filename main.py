@@ -55,9 +55,9 @@ def research_node(state: AgentState):
     """Search for news using Tavily."""
     logger.info("Starting Research Node...")
     search_queries = [
-        "The Wonderful Company news April 2026",
-        "Wonderful Pistachios news April 2026",
-        "FIJI Water news April 2026"
+        "The Wonderful Company news past week",
+        "Wonderful Pistachios news past week",
+        "FIJI Water news past week"
     ]
     
     all_results = []
@@ -65,6 +65,7 @@ def research_node(state: AgentState):
         response = tavily.search(
             query=query,
             search_depth="advanced",
+            time_range="week",
             exclude_domains=["wikipedia.org", "facebook.com", "twitter.com", "instagram.com", "linkedin.com"]
         )
         all_results.extend(response.get('results', []))
@@ -77,7 +78,7 @@ def analyst_node(state: AgentState):
     news_context = "\n".join([f"- {r['title']}: {r['content']}" for r in state['raw_news']])
     
     prompt = f"""
-    Analyze the following news results for The Wonderful Company from April 2026.
+    Analyze the following news results for The Wonderful Company from the past week (April 2026).
     
     Key milestones to look for:
     1. The company's climb to #72 on Fortune’s 100 Best Companies list.
@@ -87,7 +88,7 @@ def analyst_node(state: AgentState):
     News Data:
     {news_context}
     
-    Provide a concise summary focusing on these key points and any other significant business updates.
+    Provide a concise summary for a Weekly News Briefing, focusing on these key points and any other significant business updates.
     """
     
     response = llm.invoke(prompt)
@@ -98,11 +99,11 @@ def email_node(state: AgentState):
     logger.info("Starting Email Node...")
     
     date_str = datetime.now().strftime("%B %d, %Y")
-    subject = f"Daily News Briefing: The Wonderful Company - {date_str}"
+    subject = f"Weekly News Briefing: The Wonderful Company - {date_str}"
     
     # Generate Markdown
     email_markdown = f"""
-# Daily News Briefing: The Wonderful Company
+# Weekly News Briefing: The Wonderful Company
 **Date:** {date_str}
 
 {state['summary']}
@@ -189,7 +190,7 @@ if __name__ == "__main__":
     app = build_graph()
     
     initial_state = {
-        "query": "The Wonderful Company Daily Briefing",
+        "query": "The Wonderful Company Weekly Briefing",
         "raw_news": [],
         "summary": "",
         "email_content": "",

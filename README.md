@@ -1,20 +1,20 @@
-# Email News Digest Agent
+# Email News Weekly Digest Agent
 
-An automated news curation and delivery system built with LangGraph, Google Gemini, and Tavily. This agent researches specific company news, analyzes the findings, and delivers a formatted briefing via email.
+An automated weekly news curation and delivery system built with LangGraph, Google Gemini, and Tavily. This agent researches specific company news from the past week, analyzes the findings, and delivers a formatted weekly briefing via email.
 
 ## Features
 
-- **Automated Research:** Uses the Tavily Search API to find the latest news, specifically configured to filter out social media and Wikipedia for high-quality sources.
-- **Intelligent Analysis:** Leverages Google Gemini (Gemini 2.5 Flash) to synthesize raw news into a concise, actionable summary.
+- **Automated Research:** Uses the Tavily Search API to find the latest news from the past week, specifically configured to filter out social media and Wikipedia for high-quality sources.
+- **Intelligent Analysis:** Leverages Google Gemini (Gemini 2.5 Flash) to synthesize raw news into a concise, actionable weekly summary.
 - **Agentic Workflow:** Built using LangGraph to manage the state and transitions between research, analysis, and delivery.
-- **Email Delivery:** Automatically formats the summary into a professional HTML/Markdown email and sends it via SMTP.
+- **Email Delivery:** Automatically formats the summary into a professional HTML/Markdown weekly email and sends it via SMTP.
 - **Containerized:** Includes a `Dockerfile` for easy deployment to cloud platforms like Google Cloud Run.
 
 ## Workflow
 
-1.  **Research Node:** Queries Tavily for news related to "The Wonderful Company" and its brands (FIJI Water, Wonderful Pistachios, etc.).
-2.  **Analyst Node:** Processes the search results to identify key business milestones and updates.
-3.  **Email Node:** Generates a dual-format (Plain Text & HTML) email and dispatches it through a configured SMTP server.
+1.  **Research Node:** Queries Tavily for news related to "The Wonderful Company" and its brands (FIJI Water, Wonderful Pistachios, etc.) from the past week.
+2.  **Analyst Node:** Processes the search results to identify key business milestones and updates for a weekly briefing.
+3.  **Email Node:** Generates a dual-format (Plain Text & HTML) weekly email and dispatches it through a configured SMTP server.
 
 ## Prerequisites
 
@@ -70,7 +70,7 @@ Run the agent locally using:
 python main.py
 ```
 
-The agent will log its progress through the nodes and print the final email content to the console before attempting to send.
+The agent will log its progress through the nodes and print the final weekly email content to the console before attempting to send.
 
 ## License
 
