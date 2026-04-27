@@ -28,17 +28,17 @@ gcloud run jobs create ${JOB_NAME} \
     --set-env-vars "TAVILY_API_KEY=your_tavily_key,GOOGLE_API_KEY=your_google_key" \
     || gcloud run jobs update ${JOB_NAME} --image ${IMAGE_NAME} --region ${REGION}
 
-# 4. Create Cloud Scheduler job to trigger every Monday at 9:00 AM PT
+# 4. Create Cloud Scheduler job to trigger every Monday at 6:00 AM PT
 # Note: Cloud Run Jobs require an authenticated HTTP request to the Job Run endpoint
 # The URI follows the pattern: https://{REGION}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/{PROJECT_ID}/jobs/{JOB_NAME}:run
 
 SCHEDULE_NAME="trigger-${JOB_NAME}"
 gcloud scheduler jobs create http ${SCHEDULE_NAME} \
-    --schedule="0 9 * * 1" \
+    --schedule="0 6 * * 1" \
     --time-zone="America/Los_Angeles" \
     --uri="https://${REGION}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${PROJECT_ID}/jobs/${JOB_NAME}:run" \
     --http-method=POST \
     --oauth-service-account-email="${PROJECT_ID}-compute@developer.gserviceaccount.com" \
-    || gcloud scheduler jobs update http ${SCHEDULE_NAME} --schedule="0 9 * * 1"
+    || gcloud scheduler jobs update http ${SCHEDULE_NAME} --schedule="0 6 * * 1"
 
 echo "Deployment configuration complete!"
