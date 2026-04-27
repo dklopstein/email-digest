@@ -2,6 +2,8 @@
 
 An automated weekly news curation and delivery system built with LangGraph, Google Gemini, and Tavily. This agent researches specific company news from the past week, analyzes the findings, and delivers a formatted weekly briefing via email every Monday.
 
+![System Architechure](docs/assets/architecture-diagram.drawio.png)
+
 ## Features
 
 - **Automated Research:** Uses the Tavily Search API to find the latest news from the past week, specifically configured to filter out social media and Wikipedia for high-quality sources.
