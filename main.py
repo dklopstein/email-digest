@@ -75,20 +75,19 @@ def research_node(state: AgentState):
 def analyst_node(state: AgentState):
     """Analyze news using Gemini-2.5-flash."""
     logger.info("Starting Analyst Node...")
-    news_context = "\n".join([f"- {r['title']}: {r['content']}" for r in state['raw_news']])
+    news_context = "\n".join([f"- {r['title']} ({r['url']}): {r['content']}" for r in state['raw_news']])
     
     prompt = f"""
-    Analyze the following news results for The Wonderful Company from the past week (April 2026).
-    
-    Key milestones to look for:
-    1. The company's climb to #72 on Fortune’s 100 Best Companies list.
-    2. Sweet Cinnamon Pistachios re-release.
-    3. Lewis Cellars' Medallion Reserve launch.
+    Analyze the following news results for The Wonderful Company and its associated brands (such as Wonderful Pistachios, FIJI Water, POM Wonderful, etc.) from the past week.
     
     News Data:
     {news_context}
     
-    Provide a concise summary for a Weekly News Briefing, focusing on these key points and any other significant business updates.
+    Provide a concise summary for a Weekly News Briefing. Focus on significant business updates, product news, community initiatives, or any other relevant information pertaining to The Wonderful Company.
+    
+    IMPORTANT: For each major point or news item in your summary, include the corresponding source link(s) from the provided News Data.
+    
+    If no significant news is found in the data provided, please provide a brief, professional statement indicating that there were no major updates this week.
     """
     
     response = llm.invoke(prompt)
