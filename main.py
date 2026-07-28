@@ -1,30 +1,11 @@
 import os
 import logging
-import certifi
-import urllib3
-import requests
 import smtplib
 import markdown
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import TypedDict, List, Optional
 from datetime import datetime
-
-# Force disable SSL warnings and verification for restricted environments
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-old_merge_environment_settings = requests.Session.merge_environment_settings
-
-def merge_environment_settings(self, url, proxies, stream, verify, cert):
-    settings = old_merge_environment_settings(self, url, proxies, stream, verify, cert)
-    settings['verify'] = False
-    return settings
-
-requests.Session.merge_environment_settings = merge_environment_settings
-
-# Configure SSL for Windows
-os.environ['SSL_CERT_FILE'] = certifi.where()
-os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-os.environ['CURL_CA_BUNDLE'] = "" # Disable for curl-based tools if any
 
 from dotenv import load_dotenv
 from tavily import TavilyClient
@@ -38,6 +19,15 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
+# Configuration and API Keys
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+EMAIL_SENDER = os.getenv("EMAIL_SENDER")
+EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+
 # State Definition
 class AgentState(TypedDict):
     query: str
@@ -47,8 +37,8 @@ class AgentState(TypedDict):
     email_status: bool
 
 # Initialize Clients
-tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.environ["GOOGLE_API_KEY"])
+tavily = TavilyClient(api_key=TAVILY_API_KEY)
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=GOOGLE_API_KEY)
 
 # Nodes
 def research_node(state: AgentState):
@@ -129,19 +119,13 @@ def email_node(state: AgentState):
     """
     
     def send_email(text_content: str, html_content: str):
-        sender_email = os.getenv("EMAIL_SENDER")
-        receiver_email = os.getenv("EMAIL_RECEIVER")
-        password = os.getenv("EMAIL_PASSWORD")
-        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_PORT", "465"))
-
-        if not all([sender_email, receiver_email, password]):
+        if not all([EMAIL_SENDER, EMAIL_RECEIVER, EMAIL_PASSWORD]):
             logger.error("Missing email configuration (EMAIL_SENDER, EMAIL_RECEIVER, or EMAIL_PASSWORD).")
             return False
 
         msg = MIMEMultipart("alternative")
-        msg["From"] = sender_email
-        msg["To"] = receiver_email
+        msg["From"] = EMAIL_SENDER
+        msg["To"] = EMAIL_RECEIVER
         msg["Subject"] = subject
         
         # Attach both parts (client will choose the best one, usually HTML)
@@ -149,15 +133,15 @@ def email_node(state: AgentState):
         msg.attach(MIMEText(html_content, "html"))
 
         try:
-            logger.info(f"Sending email via {smtp_server}:{smtp_port}...")
-            if smtp_port == 465:
-                with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
-                    server.login(sender_email, password)
+            logger.info(f"Sending email via {SMTP_SERVER}:{SMTP_PORT}...")
+            if SMTP_PORT == 465:
+                with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+                    server.login(EMAIL_SENDER, EMAIL_PASSWORD)
                     server.send_message(msg)
             else:
-                with smtplib.SMTP(smtp_server, smtp_port) as server:
+                with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
                     server.starttls()
-                    server.login(sender_email, password)
+                    server.login(EMAIL_SENDER, EMAIL_PASSWORD)
                     server.send_message(msg)
             logger.info("Email sent successfully!")
             return True
