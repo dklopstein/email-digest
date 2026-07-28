@@ -1,6 +1,22 @@
 # Weekly Email News Digest Agent
 
-An automated weekly news curation and delivery agent built with LangGraph, Google Gemini, and Tavily.
+An automated weekly news curation and delivery system built with LangGraph, Google Gemini, and Tavily. This agent researches specific company news from the past week, analyzes the findings, and delivers a formatted weekly briefing via email every Monday.
+
+![System Architechure](docs/assets/architecture-diagram.drawio.png)
+
+## Features
+
+- **Automated Research:** Uses the Tavily Search API to find the latest news from the past week, specifically configured to filter out social media and Wikipedia for high-quality sources.
+- **Intelligent Analysis:** Leverages Google Gemini (Gemini 2.5 Flash) to synthesize raw news into a concise, actionable weekly summary.
+- **Agentic Workflow:** Built using LangGraph to manage the state and transitions between research, analysis, and delivery.
+- **Email Delivery:** Automatically formats the summary into a professional HTML/Markdown weekly email and sends it via SMTP.
+- **Cloud Native:** Deployed to Google Cloud Platform using Cloud Run Jobs and Cloud Scheduler for reliable, serverless execution.
+
+## Workflow
+
+1.  **Research Node:** Queries Tavily for news related to "The Wonderful Company" and its brands (FIJI Water, Wonderful Pistachios, etc.) from the past week.
+2.  **Analyst Node:** Processes the search results to identify key business milestones and updates for a weekly briefing.
+3.  **Email Node:** Generates a dual-format (Plain Text & HTML) weekly email and dispatches it through a configured SMTP server.
 
 ## Deployment to Google Cloud Platform (GCP)
 
